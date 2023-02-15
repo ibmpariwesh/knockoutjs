@@ -1,0 +1,96 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title></title>
+    <link href="css/fonts.css" rel="stylesheet" />
+    <link href="css/styles.css" rel="stylesheet" />
+    <script src="Scripts/jquery-2.0.3.js"></script>
+    <script src="Scripts/knockout-2.3.0.js"></script>
+    <script type="text/javascript">
+        
+    </script>
+</head>
+<body>
+    <h2>Knockout Template Awesomeness</h2>
+    <div id='contactsList'>
+        <table>
+            <thead>
+                <tr data-bind="template: {name:  'columnHeaderTemplate' , foreach: columns} "></tr>
+            </thead>
+            <tbody data-bind="template: { name: 'dataTemplate', foreach: contacts } " ></tbody>
+            <tfoot data-bind="template: {name:  'footerTemplate' }"></tfoot>
+        </table>
+    </div>    <p>
+        <button data-bind='click: addContact'>Add a contact</button>
+        <button data-bind='click: save, enable: contacts().length > 0'>Save to JSON</button>    </p>
+    <textarea data-bind='value: lastSavedJson' rows='5' cols='60' disabled='disabled'> </textarea>
+    
+    <script type="text/x-jquery-tmpl" id="columnHeaderTemplate">
+        <th>
+            <span data-bind='text: columnName'></span>
+        </th>
+    </script>
+    <script type="text/x-jquery-tmpl" id="dataTemplate">
+        <tr>
+            <td><input data-bind='value: firstName' /></td>
+            <td><input data-bind='value: lastName' /></td>
+            <td><input data-bind='value: empSal' /></td>
+            <td><input data-bind='value: empAge' /></td>
+            <td><div><a href='#' data-bind='click: $root.removeContact'>Delete</a></div></td>
+        </tr>
+    </script>
+    <script type="text/x-jquery-tmpl" id="footerTemplate">
+        <tr>
+            <td>Total Records: <span data-bind="text: contacts().length"></span></td>
+            <td>Avg Age: <span data-bind="text: getAvgAge"></span></td>
+        </tr>
+    </script>
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            //model
+            var initialData = [
+                { firstName: "Danny", lastName: "LaRusso", empSal: "1200", empAge: "23" },
+                { firstName: "Adam", lastName: "Sandler", empSal: "4545", empAge: "32" },
+                { firstName: "Sensei", lastName: "Miyagi", empSal: "9898", empAge: "56" }
+            ];
+            var columnData = [
+                { columnName: "First Name" },
+                { columnName: "Last Name" }, { columnName: "Salary" }, { columnName: "Age" }, { columnName: "Action" }
+            ];
+            //viewmodel
+            var ContactsModel = function (columns, contacts) {
+                var self = this;
+                self.contacts = ko.observableArray(ko.utils.arrayMap(contacts, function (contact) {
+                    return { firstName: contact.firstName, lastName: contact.lastName, empSal: contact.empSal, empAge: ko.observable(contact.empAge)};
+                }));
+                self.columns = ko.observableArray(ko.utils.arrayMap(columns, function (column) { return { columnName: column.columnName } }));
+                self.addContact = function () {
+                    self.contacts.push({
+                        firstName: "New Contact", lastName: "New Last Name", empSal: "000", empAge: ko.observable("0")
+                    });
+                };
+                self.removeContact = function (contact) {
+                    self.contacts.remove(contact);
+                };
+                self.save = function () {
+                    self.lastSavedJson(JSON.stringify(ko.toJS(self.contacts), null, 2));
+                };
+                self.getAvgAge = ko.computed(function () {
+                    var total = 0;
+                    for (var i = 0; i < self.contacts().length; i++)
+                    {
+                        total += parseInt(self.contacts()[i].empAge());
+                    }
+                    return total / self.contacts().length;
+                });
+                self.lastSavedJson = ko.observable("")
+            };
+            
+            ko.applyBindings(new ContactsModel(columnData, initialData));
+        });
+    </script>
+
+</body>
+
+</html>
