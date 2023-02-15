@@ -1,0 +1,51 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title></title>
+    <link href="css/fonts.css" rel="stylesheet" />
+    <link href="css/styles.css" rel="stylesheet" />
+    <script src="Scripts/jquery-2.0.3.js"></script>
+    <script src="Scripts/knockout-2.3.0.js"></script>
+    <script type="text/javascript">
+        
+    </script>
+</head>
+<body>
+    <div>
+        <h2>People Manager</h2>
+        <ul data-bind="foreach: Companies">
+            <li>
+                <div>
+                    <span data-bind="text: name"> </span> has <span data-bind='text: employees().length'>&nbsp;</span> employees:
+                    <a href="#" type="button"data-bind='click: addEmployee'>Add Employee</a>                    
+                </div>
+                <ul data-bind="foreach: employees">
+                    <li><span data-bind="text: $data"/></li>
+                </ul>
+            </li>
+        </ul>        
+    </div>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            // Define a "Person" class that tracks its own name and children, and has a method to add a new child
+            var Company = function (name, employees) {
+                this.name = name;                
+                this.employees = ko.observableArray(employees);
+                this.addEmployee = function () {                   
+                    this.employees.push("**new employee**");
+                }.bind(this);
+            }
+            // The view model is an abstract description of the state of the UI, but without any knowledge of the UI technology (HTML)
+            var viewModel = {                
+                Companies: [
+                    new Company("CT Lien", ["Chris", "Che", "Tuan"]),
+                    new Company("CT Corp", ["Venky", "Tom", "Mike", "Dan"])                    
+                ]};
+
+            ko.applyBindings(viewModel);
+        });
+    </script>
+
+</body>
+
+</html>
