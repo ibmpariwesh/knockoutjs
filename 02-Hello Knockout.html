@@ -1,0 +1,61 @@
+﻿<html>
+
+<head>
+    <title></title>
+    <link href="css/fonts.css" rel="stylesheet" />
+    <link href="css/styles.css" rel="stylesheet" />
+    <script src="Scripts/jquery-2.0.3.js"></script>
+    <script src="Scripts/knockout-2.3.0.js"></script>
+</head>
+
+<body>
+    <div>
+        <h2>using Knockout</h2>
+        <span class="caption">Employee name: </span><span id="empName" data-bind="text: empName"
+            class="text"></span><br />
+        <span class="caption">Employee Salary: </span><input id="empSal" data-bind="value: empSal" class="text" /><br />
+        <span class="caption">Employee Designation: </span><input id="empoyeeDesignation"
+            data-bind="value: empDesignation" class="text" /><br />
+        <input type="button" data-bind="click:saveToJson" value="Save to JSON" />
+        <textarea style="width:500px; height:100px" id="result" class="text"></textarea>
+        <div data-bind="text: details"></div>
+    </div>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            // viewmodel
+            var employee = {
+                empName: ko.observable("John"),
+                empSal: ko.observable("9999999"),
+                empDesignation: "Technical Manager",
+                details: ko.observable()
+            };
+            employee.empName.subscribe(function (newValue) {
+                console.log(newValue);
+            });
+            employee.saveToJson = function () {
+                console.log(employee.empName());//getter
+                employee.empName("tim").empSal(3333); //setter
+                const jsonData = ko.toJSON(employee);
+                const promise = fetch("http://localhost:3000/employees", {
+                    method: 'post',
+                    body: jsonData,
+                    headers: {
+                        'content-type': 'application/json'
+                    }
+                });
+                promise.then((data) => {
+                    // alert('success');
+                    employee.details("<h6>Success</h6>")
+                    console.log(data);
+                })
+
+                $("#result").text(jsonData);
+            };
+            // initializa the bindings
+            ko.applyBindings(employee);
+        });
+    </script>
+
+</body>
+
+</html>
